@@ -21,9 +21,13 @@ def grab_songs(url):
     else:
         print(f"Failed to retrieve the URL. Status code: {response.status_code}")
     for str in elements_list.split("\n"):
-        song_list.append(clean_string(str))
+        if len(str.strip()) > 0:
+            song_list.append(clean_string(str))
     return song_list
 
 def clean_string(str):
     cleaned_string = re.sub(r'\[[^]]*\]', '', str)
     return cleaned_string.strip()
+
+if __name__ == "__main__":
+    print("This is just a module")
