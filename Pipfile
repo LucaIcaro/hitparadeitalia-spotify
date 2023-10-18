@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 requests = "*"
 bs4 = "*"
+spotipy = "*"
+mock = "*"
 
 [dev-packages]
 
