@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 import spotify_playlist
 
-class TestSeeAlbum(unittest.TestCase):
+class TestSpotifyPlaylist(unittest.TestCase):
     @patch('spotify_playlist.SpotifyClientCredentials', Mock())
     @patch('spotify_playlist.spotipy.Spotify')
     def test_see_album(self, mock_spotify):
@@ -79,13 +79,14 @@ class TestSeeAlbum(unittest.TestCase):
 
     @patch('spotify_playlist.SpotifyClientCredentials', Mock())
     @patch('spotify_playlist.spotipy.Spotify')
-    def test_search(self, mock_spotify):
+    def test_search_track(self, mock_spotify):
         # Create a mock Spotify instance
         mock_spotify_instance = mock_spotify.return_value
 
         # Define the expected API response
         api_response = {'tracks':
-            {'items':
+            {   'total': 1,
+                'items':
                  [{
                    'id': 'ABCDEF12345',
                 }], }}
@@ -95,6 +96,24 @@ class TestSeeAlbum(unittest.TestCase):
         mock_spotify_instance.search.assert_called_with("track:track1 artist:artist1",limit=1,type="track")
         self.assertEqual(result, 'ABCDEF12345')
 
+    @patch('spotify_playlist.SpotifyClientCredentials', Mock())
+    @patch('spotify_playlist.spotipy.Spotify')
+    def test_search_track_empty(self, mock_spotify):
+        # Create a mock Spotify instance
+        mock_spotify_instance = mock_spotify.return_value
+
+        # Define the expected API response
+        api_response = {'tracks':
+            {'total': 0
+                }
+            }
+
+        mock_spotify_instance.search.return_value = api_response
+        result = spotify_playlist.search_track("track1","artist1")
+        mock_spotify_instance.search.assert_called_with("track:track1 artist:artist1",limit=1,type="track")
+        self.assertEqual(result, None)
+
+# missing test for create_modify_playlist
 
 if __name__ == '__main__':
     unittest.main()

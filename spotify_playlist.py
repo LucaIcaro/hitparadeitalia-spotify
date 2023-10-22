@@ -38,21 +38,31 @@ def search_track(track, artist):
     sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
     search_string = "track:" + track + " " + "artist:" + artist
     result = sp.search(search_string,limit=1,type="track")
-    return result['tracks']['items'][0]['id']
+    if result['tracks']['total'] != 0:
+        return result['tracks']['items'][0]['uri']
+    else:
+        return None
 
 def create_modify_playlist(user, playlist_name, is_public=None, description=None):
+    # This function returns a json payload if the playlist is created
+    # but returns None if it gets modified
     playlists_list = see_private_playlists()
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
     if not check_playlist_exists(playlist_name, playlists_list):
         results = sp.user_playlist_create(user=user, name=playlist_name, public=is_public, description=description)
-        print(results)
+        return results['id']
     else:
         playlist_id = get_playlist_id(playlist_name)
         results = sp.user_playlist_change_details(user=user, playlist_id=playlist_id, public=is_public, description=description)
-        print(results)
-    return results
+        return results
 
 def get_user_id():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
     results = sp.current_user()
     return results['id']
+
+def add_track_to_playlist(playlist_id, track_uri, position=None):
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    results = sp.playlist_add_items(playlist_id=playlist_id, items=track_uri, position=position)
+    print(results)
+    return results

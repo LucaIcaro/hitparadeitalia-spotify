@@ -8,6 +8,7 @@ def grab_songs(url):
     # fix encoding problems for italian accents
     response.encoding = response.apparent_encoding
     song_list = []
+    pattern = r'\([^)]*\)'
 
     if response.status_code == 200:
         html_content = response.text
@@ -22,7 +23,10 @@ def grab_songs(url):
         print(f"Failed to retrieve the URL. Status code: {response.status_code}")
     for str in elements_list.split("\n"):
         if len(str.strip()) > 0:
-            track, artist = clean_string(str).rsplit(' - ', 1)
+            track_artist = clean_string(str).rsplit(' - ', 1)
+            # Remove content within parentheses using regex
+            track = re.sub(pattern, '', track_artist[0]).strip()
+            artist = re.sub(pattern, '', track_artist[1]).strip()
             track_artist_dict = {'track': track, 'artist': artist}
             song_list.append(track_artist_dict)
     return song_list
