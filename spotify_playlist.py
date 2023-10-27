@@ -64,5 +64,4 @@ def get_user_id():
 def add_track_to_playlist(playlist_id, track_uri, position=None):
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
     results = sp.playlist_add_items(playlist_id=playlist_id, items=track_uri, position=position)
-    print(results)
     return results
