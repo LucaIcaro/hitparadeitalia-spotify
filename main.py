@@ -1,10 +1,10 @@
 import grabber
 import spotify_playlist
 
-def main():
+def playlist_top_100():
     urlPrefix = "https://hitparadeitalia.it/hp_yends/hpe"
     urlSuffix = ".htm"
-    yearsRange = range(1947, 1948, 1)
+    yearsRange = range(1947, 2023, 1)
     for year in yearsRange:
         playlist_name = 'Top Hits Italia ' + str(year)
         description = "La Top Hits italiana presa da https://hitparadeitalia.it/ !!! canzoni mancanti: "
@@ -19,11 +19,9 @@ def main():
                     missing_songs += 1
             description = description + str(missing_songs)
             spotify_playlist.create_modify_playlist(user=spotify_playlist.get_user_id(),playlist_name=playlist_name,description=description)
-# todo:
-# 1. spotify function that can add or edit tracks
-# 2. loop in main to add them
-# 3. if create_playlist == none, then skip
 
+def main():
+    playlist_top_100()
 
 if __name__ == "__main__":
     main()
