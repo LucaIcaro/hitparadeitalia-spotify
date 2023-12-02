@@ -26,9 +26,11 @@ def see_private_playlists():
 def get_playlist_id(playlist_name):
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
     results = sp.current_user_playlists(limit=50)
-    for item in results['items']:
-        if item['name'] == playlist_name:
-            return item['id']
+    while results['next']:
+        for item in results['items']:
+            if item['name'] == playlist_name:
+                return item['id']
+        results = sp.next(results)
     return None
 
 def check_playlist_exists(playlist_name, playlists_list):
@@ -65,3 +67,12 @@ def add_track_to_playlist(playlist_id, track_uri, position=None):
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
     results = sp.playlist_add_items(playlist_id=playlist_id, items=track_uri, position=position)
     return results
+
+def remove_songs_from_playlist(playlist_id):
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    results = sp.playlist_tracks(playlist_id)
+    song_list = []
+    for result in results['items']:
+        song_list.append(result['track']['id'])
+    return sp.playlist_remove_all_occurrences_of_items(playlist_id,song_list)
+    
