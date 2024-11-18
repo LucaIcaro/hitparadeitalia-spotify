@@ -36,14 +36,16 @@ def get_playlist_id(playlist_name):
 def check_playlist_exists(playlist_name, playlists_list):
     return (playlist_name in playlists_list)
 
-def search_track(track, artist):
+def search_track(track, artist, look_for_alternatives=False):
     sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
     search_string = "track:" + track + " " + "artist:" + artist
     result = sp.search(search_string,limit=1,type="track")
     if result['tracks']['total'] != 0:
         return result['tracks']['items'][0]['uri']
-    else:
-        return None
+    elif look_for_alternatives == True and result['tracks']['total'] == 0:
+        sanitised_artist = sanitize_artist_name(artist)
+        search_track(track, sanitised_artist, False)    
+    return None
 
 def create_modify_playlist(user, playlist_name, is_public=None, description=None):
     # This function returns a json payload if the playlist is created
@@ -75,4 +77,15 @@ def remove_songs_from_playlist(playlist_id):
     for result in results['items']:
         song_list.append(result['track']['id'])
     return sp.playlist_remove_all_occurrences_of_items(playlist_id,song_list)
-    
+
+def sanitize_artist_name(artist):
+    if ' &' in artist:
+        divider = ' &'
+    elif ' -' in artist:
+        divider = ' -'
+    elif ' feat.' in artist:
+        divider = ' feat.'
+    else:
+        return artist
+    sanitized_artist = artist.split(divider)[0]
+    return sanitized_artist

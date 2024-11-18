@@ -4,20 +4,21 @@ import spotify_playlist
 def playlist_top_100():
     urlPrefix = "https://hitparadeitalia.it/hp_yends/hpe"
     urlSuffix = ".htm"
-    yearsRange = range(1947, 2010, 1)
+    yearsRange = range(1964, 2011, 1)
     for year in yearsRange:
         print(year)
         playlist_name = 'Top Hits Italia ' + str(year)
         description = "La Top Hits italiana presa da https://hitparadeitalia.it/ !!! canzoni mancanti: "
         playlist_id = spotify_playlist.get_playlist_id(playlist_name=playlist_name)
         if playlist_id is None:
+            print('creating new playlist for ', year)
             playlist_id = spotify_playlist.create_modify_playlist(user=spotify_playlist.get_user_id(),playlist_name=playlist_name,description=description)
         missing_songs = 0
         song_list = []
         missing_song_names = []
         if playlist_id is not None:
             for index, song in enumerate(grabber.grab_songs(urlPrefix + str(year) + urlSuffix)):
-                track_id = spotify_playlist.search_track(song['track'], song['artist'])
+                track_id = spotify_playlist.search_track(song['track'], song['artist'], look_for_alternatives=True)
                 if track_id is not None:
                     song_list.append(track_id)
                 else:
